@@ -146,7 +146,7 @@ Cyg_Mempool_Fixed::free( cyg_uint8 *p )
 // returns true on success
 cyg_uint8 *
 Cyg_Mempool_Fixed::resize_alloc( cyg_uint8 *alloc_ptr, cyg_int32 newsize,
-                                 cyg_int32 *oldsize=NULL )
+                                 cyg_int32 *oldsize )
 {
     return mypool.resize_alloc( alloc_ptr, newsize, oldsize );
 }
