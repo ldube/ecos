@@ -53,6 +53,8 @@
     cf_clear_interrupt(slot);                                   \
     CYG_MACRO_END
 
+#define CYGHWR_NS_DP83902A_PLF_16BIT_DATA
+
 #endif // __WANT_CONFIG
 
 #ifdef __WANT_DEVS

@@ -60,6 +60,7 @@
 #include <cyg/io/pcmcia.h>
 #include <eth_drv.h>
 #include <netdev.h>
+#include <string.h>
 
 #ifdef CYGPKG_NET
 #include <pkgconf/net.h>
@@ -73,6 +74,7 @@
 #define DP_CARD_RESET   0x1f
 
 #define SC_LPE_MANUF 0x0104
+#define FA411_MANUF  0x0149
 
 
 
@@ -114,11 +116,13 @@ sc_lpe_card_handler(cyg_addrword_t param)
     unsigned char buf[256], *cp;
     cyg_uint8* base;
     unsigned char *vers_product, *vers_manuf, *vers_revision, *vers_date;
+    cyg_uint16 manuf_id = 0;
 #ifndef CYGPKG_NET
     int tries = 0;
 #endif
     bool first = true;
 
+    memset(&config, 0, sizeof(config));
     slot = (struct cf_slot*)dp->plf_priv;
     cyg_drv_dsr_lock();
     while (true) {
@@ -141,10 +145,8 @@ sc_lpe_card_handler(cyg_addrword_t param)
             len = sizeof(buf);
             ptr = 0;
             if (cf_get_CIS(slot, CF_CISTPL_MANFID, buf, &len, &ptr)) {
-                if (*(short *)&buf[2] != SC_LPE_MANUF) {
-                    diag_printf("Not a SC LPE, sorry\n");
-                    continue;
-                }
+                manuf_id = *(short *)&buf[2];
+                //diag_printf("MANFID = 0x%x\n", *(short *)&buf[2]);
             } 
             ptr = 0;
             if (cf_get_CIS(slot, CF_CISTPL_VERS_1, buf, &len, &ptr)) {
@@ -178,7 +180,17 @@ sc_lpe_card_handler(cyg_addrword_t param)
                 if (cf_parse_cftable(buf, len, &cftable)) {
                     cyg_uint8 tmp;
                     // Initialize dp83902a IO details
-                    dp->base = base = (cyg_uint8*)&slot->io[cftable.io_space.base[0]];
+                    if (cftable.io_space.num_addrs) {
+                      base = (cyg_uint8*)&slot->io[cftable.io_space.base[0]];
+                    } else if (manuf_id == FA411_MANUF && (config.mask[0] & 0x60) == 0x60) {
+                      volatile unsigned char *cfg = slot->attr;
+                      unsigned short io_offset = cfg[config.reg[6]];
+                      io_offset = (io_offset << 8) | cfg[config.reg[5]];
+                      base = (cyg_uint8*)&slot->io[io_offset];
+                    } else {
+                      base = (cyg_uint8*)&slot->io[0];
+                    }
+                    dp->base = base;
                     dp->data = base + DP_DATA;
                     dp->interrupt = slot->int_num;
                     cf_set_COR(slot, cor, cftable.cor);
@@ -220,7 +232,11 @@ sc_lpe_card_handler(cyg_addrword_t param)
                             for (i = 0;  i < 32;  i++) {
                                 HAL_READ_UINT8(base+DP_DATAPORT, prom[i]);
                             }
-                            if ((prom[0] == sc_lpe_addr[0]) &&
+                            if (manuf_id == FA411_MANUF && (config.mask[0] & 0x60) == 0x60) {
+                              for (i = 0;  i < 6;  i++) {
+                                sc_lpe_addr[i] = prom[i*2];
+                              }
+                            } else if ((prom[0] == sc_lpe_addr[0]) &&
                                 (prom[2] == sc_lpe_addr[1]) &&
                                 (prom[4] == sc_lpe_addr[2])) {
                                 diag_printf("Getting address from port\n");

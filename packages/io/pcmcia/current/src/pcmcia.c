@@ -179,6 +179,9 @@ cf_parse_IO_space_structure(unsigned char **buf, struct cf_io_space *io_space)
 //            diag_printf("IO addr %d - base: %x, length: %x\n", i, base, length);
         }
     }
+    else {
+      io_space->num_addrs = 0;
+    }
     *buf = bp;
 }
 
@@ -232,6 +235,23 @@ cf_parse_config(unsigned char *buf, int len, struct cf_config *config)
     config->mask_length = ((tpcc_sz & 0x3C) >> 2) + 1;
     for (i = 0;  i < config->mask_length;  i++) {
         config->mask[i] = *buf++;
+    }
+    if (config->mask_length) {
+        unsigned char msk = config->mask[0];
+        if (msk & 0x01) {
+          config->reg[0] = config->base + 0x0;
+        }
+        if (msk & 0x02) {
+          config->reg[1] = config->base + 0x2;
+        }
+        if (msk & 0x20)
+        {
+          config->reg[5] = config->base + 0xA;
+        }
+        if (msk & 0x40)
+        {
+          config->reg[6] = config->base + 0xC;
+        }
     }
     return true;
 }

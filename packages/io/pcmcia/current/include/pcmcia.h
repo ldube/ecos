@@ -104,6 +104,7 @@ struct cf_config {
     unsigned long base;
     int           mask_length;
     unsigned char mask[16];
+    unsigned int reg[8];
 };
 
 // Function prototypes
