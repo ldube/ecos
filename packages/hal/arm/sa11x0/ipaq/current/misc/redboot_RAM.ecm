@@ -74,4 +74,8 @@ cdl_option CYGOPT_REDBOOT_FIS_REDBOOT_BACKUP {
     user_value 0
 };
 
+cdl_option CYGNUM_HAL_VIRTUAL_VECTOR_CONSOLE_CHANNEL_BAUD {
+    user_value 115200
+};
+
 
