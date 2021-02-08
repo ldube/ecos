@@ -233,9 +233,12 @@ sc_lpe_card_handler(cyg_addrword_t param)
                                 HAL_READ_UINT8(base+DP_DATAPORT, prom[i]);
                             }
                             if (manuf_id == FA411_MANUF && (config.mask[0] & 0x60) == 0x60) {
+// Set to 1 to get the hardware mac address from card.
+#if 0
                               for (i = 0;  i < 6;  i++) {
                                 sc_lpe_addr[i] = prom[i*2];
                               }
+#endif
                             } else if ((prom[0] == sc_lpe_addr[0]) &&
                                 (prom[2] == sc_lpe_addr[1]) &&
                                 (prom[4] == sc_lpe_addr[2])) {
