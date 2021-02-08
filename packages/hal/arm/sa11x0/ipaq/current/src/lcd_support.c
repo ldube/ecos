@@ -162,6 +162,7 @@ _hexdigit(char c)
     if ((c >= 'a') && (c <= 'f')) {
         return (c - 'a') + 0x0a;
     }
+    return 0;
 }
 
 static int
@@ -279,9 +280,9 @@ lcd_init(int depth)
     fp = (struct lcd_frame *)hal_virt_to_phys_address((cyg_uint32)lcd_frame_buffer);
     // Enable LCD in 320x240 16bpp
     *SA1110_DBAR1 = (unsigned long)&(fp->palette);
-    *SA1110_LCCR1 = 0x09100C00 + DISPLAY_WIDTH - 16;
-    *SA1110_LCCR2 = 0x08010C00 + DISPLAY_HEIGHT - 1;
-    *SA1110_LCCR3 = 0x0030000a;
+    *SA1110_LCCR1 = 0x0b100800 + DISPLAY_WIDTH - 16;
+    *SA1110_LCCR2 = 0x0a010400 + DISPLAY_HEIGHT - 1;
+    *SA1110_LCCR3 = 0x00300010;
     fp->palette[0] = 0x2000;  // Tell controller true color / 16 bits
     *SA1110_LCCR0 = 0xB9;     // Color
     ipaq_EGPIO(SA1110_EIO_LCD_3V3|SA1110_EIO_LCD_CTRL|SA1110_EIO_LCD_5V|SA1110_EIO_LCD_VDD,
