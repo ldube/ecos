@@ -147,5 +147,53 @@ extern void ipaq_EGPIO(unsigned long mask, unsigned long value);
 #define SA1110_LCCR2                SA11X0_REGISTER(0x30100024)
 #define SA1110_LCCR3                SA11X0_REGISTER(0x30100028)
 
+// PC Card/Compact Flash Interface for SA-1100 / SA-1110
+#define LINKUP_SLOT0 *(volatile unsigned short*)(0x1a000000)
+#define LINKUP_SLOT1 *(volatile unsigned short*)(0x19000000)
+
+// STATUS REGISTER
+// ===============
+//3:0 S4:S1 These 4 bits reflect the current status of the Voltage Control Pins S4 down to S1.
+#define STATUS_BVD1 (1 << 4)  // Battery Voltage Detect 1 status. This bit 
+                              // reflects the status of P_BVD[1] pin.
+#define STATUS_BVD2 (1 << 5)  // Battery Voltage Detect 2 status. This bit reflects
+                              // the status of P_BVD[2] pin.
+#define STATUS_VS1  (1 << 6)  // Voltage Sense 1 status. This bit reflects the status 
+                              // of P_VS[1] pin.
+#define STATUS_VS2  (1 << 7)  // Voltage Sense 2 status. This bit reflects the status 
+                              // of P_VS[2] pin.
+#define STATUS_RDY  (1 << 8)  // P_RDY status. This bit reflects the status of P_RDY pin.
+#define STATUS_CD1  (1 << 9)  // Card Detect 1: P_nCD[1] status. This bit reflects 
+                              // the status of P_nCD[1] pin.
+#define STATUS_CD2  (1 << 10) // Card Detect 2: P_nCD[2] status. This bit reflects 
+                              // the status of P_nCD[2] pin.
+//15:12 ID Chip ID: This ID is for LinkUp Systems Corporation internal use only.
+
+// COMMAND REGISTER
+// ================
+
+#define CMD_S1    (1 << 0) // S1 Voltage Control 1 (5v active low?)
+#define CMD_S2    (1 << 1) // S2 Voltage Control 2 (3v active low?)
+#define CMD_S3    (1 << 2) // S3 Voltage Control 3 (vcc)
+#define CMD_S4    (1 << 3) // S4 Voltage Control 4
+
+#define CMD_RESET (1 << 4) // RESET Software Reset, this bit drives the P_RESET output. 
+                           // If set to high the P_RESET output is high.
+#define CMD_APOE  (1 << 5) // APOE Automatic power off enable: When this bit is set, 
+                           // S[4:1] will be cleared when P_nCD1 or P_nCD2 is high 
+                           // effectively turning off the power to the slot. S[4:1] will not
+                           // regain the state if P_nCD1 and P_nCD2 should become active but
+                           // have to be set under software control.
+#define CMD_CFE   (1 << 6) // CFE Compact Flash enable: If this bit is set the device is in
+                           // Compact Flash mode. Addressing is limited to the space A[10:0] 
+                           // as defined by Compact Flash standard. A[25:11] are driven high.
+#define CMD_SOE   (1 << 7) // SOE PC Card socket signal output driver enable. The socket 
+                           // signals cannot be driven active unless this bit is set.
+#define CMD_SSP   (1 << 8) // SSP Socket Select Polarity: This bit has to be programmed in
+                           // a two-slot system.
+                           // If this bit is "0" the device will respond when PSKTSEL is "0"
+                           // If this bit is "1" the device will respond when PSKTSEL is "1"
+#define CMD_TST   (1 << 15)// TST Test bit: This bit should be set to 0 at all times
+
 /* end of ipaq.h                                                          */
 #endif /* CYGONCE_IPAQ_H */

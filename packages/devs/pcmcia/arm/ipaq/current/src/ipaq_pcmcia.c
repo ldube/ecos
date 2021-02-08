@@ -220,9 +220,12 @@ cf_hwr_change_state(struct cf_slot *slot, int new_state)
             do_delay(30);  // At least 300 ms
             slot->state = CF_SLOT_STATE_Powered;
             ipaq_EGPIO( SA1110_EIO_CF_RESET, SA1110_EIO_CF_RESET_ENABLE);
+            LINKUP_SLOT0 = ( CMD_RESET | CMD_APOE | CMD_SOE | CMD_S1); //Reset
             do_delay(1);  // At least 10 us
             slot->state = CF_SLOT_STATE_Reset;
             ipaq_EGPIO( SA1110_EIO_CF_RESET, SA1110_EIO_CF_RESET_DISABLE);
+            do_delay(5); // At least 20 ms
+            LINKUP_SLOT0 = ( CMD_APOE | CMD_SOE | CMD_S1);
             do_delay(5); // At least 20 ms
             // Wait until the card is ready to talk
             for (i = 0;  i < 10;  i++) {
