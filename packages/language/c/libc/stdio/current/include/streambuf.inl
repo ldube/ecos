@@ -66,8 +66,8 @@
 // FUNCTIONS
     
 inline
-Cyg_StdioStreamBuffer::Cyg_StdioStreamBuffer( cyg_ucount32 size=BUFSIZ,
-                                              cyg_uint8 *new_buffer=NULL ) :
+Cyg_StdioStreamBuffer::Cyg_StdioStreamBuffer( cyg_ucount32 size,
+                                              cyg_uint8 *new_buffer ) :
 #if defined(CYGSEM_LIBC_STDIO_SETVBUF_MALLOC)
     call_free(false),
     buffer_bottom( NULL ),

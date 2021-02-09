@@ -3016,3 +3016,11 @@ tcp_newreno(tp, th)
     return 0;
 }
 #endif /* TCP_NEWRENO || TCP_SACK */
+
+#ifdef _KERNEL
+tcp_seq	tcp_iss;		/* tcp initial send seq # */
+u_int32_t tcp_now;	
+struct	inpcbtable tcbtable;	/* head of queue of active tcpcb's */
+struct	tcpstat tcpstat;	/* tcp statistics */
+#endif
+

@@ -332,3 +332,7 @@ pffasttimo(arg)
                     }
 	timeout(pffasttimo, NULL, hz/5);
 }
+
+#ifdef _KERNEL
+struct	domain *domains;
+#endif

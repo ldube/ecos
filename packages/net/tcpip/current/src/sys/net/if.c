@@ -983,3 +983,14 @@ ifconf(cmd, data)
 	ifc->ifc_len -= space;
 	return (error);
 }
+
+/*FIXME move here from header if.h to avoid multiple definition*/
+
+struct ifnet_head ifnet;
+struct ifnet **ifindex2ifnet;
+#if 0
+struct ifnet loif[];
+#endif
+int if_index;
+
+

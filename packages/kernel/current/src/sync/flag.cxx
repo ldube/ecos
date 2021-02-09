@@ -58,7 +58,7 @@
 // -------------------------------------------------------------------------
 // Constructor
 
-Cyg_Flag::Cyg_Flag( Cyg_FlagValue init = 0 )
+Cyg_Flag::Cyg_Flag( Cyg_FlagValue init )
 {
     CYG_REPORT_FUNCTION();
     value = init;
@@ -121,7 +121,7 @@ Cyg_Flag::check_this(cyg_assert_class_zeal zeal) const
 // argument.  This cannot make a wait condition become true, so there's not
 // much to it.
 void
-Cyg_Flag::maskbits( Cyg_FlagValue arg = 0 )
+Cyg_Flag::maskbits( Cyg_FlagValue arg )
 {
     CYG_REPORT_FUNCTION();
   
@@ -145,7 +145,7 @@ Cyg_Flag::maskbits( Cyg_FlagValue arg = 0 )
 // by the time they get to run.
 
 void
-Cyg_Flag::setbits( Cyg_FlagValue arg = ~0 )
+Cyg_Flag::setbits( Cyg_FlagValue arg )
 {
     CYG_REPORT_FUNCTION();
     CYG_ASSERTCLASS( this, "Bad this pointer");

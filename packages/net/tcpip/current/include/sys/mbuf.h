@@ -456,13 +456,13 @@ struct mbstat {
 #ifdef	_KERNEL
 extern	struct mbuf *mbutl;		/* virtual address of mclusters */
 extern	char *mclrefcnt;		/* cluster reference counts */
-struct	mbstat mbstat;
+extern	struct	mbstat mbstat;
 extern	int nmbclusters;
-union	mcluster *mclfree;
-int	max_linkhdr;			/* largest link-level header */
-int	max_protohdr;			/* largest protocol header */
-int	max_hdr;			/* largest link+protocol header */
-int	max_datalen;			/* MHLEN - max_hdr */
+extern union	mcluster *mclfree;
+extern	int	max_linkhdr;			/* largest link-level header */
+extern	int	max_protohdr;			/* largest protocol header */
+extern	int	max_hdr;			/* largest link+protocol header */
+extern	int	max_datalen;			/* MHLEN - max_hdr */
 extern	int mbtypes[];			/* XXX */
 extern	int needqueuedrain;		/* True if allocation failed at */
 					/* interrupt level */

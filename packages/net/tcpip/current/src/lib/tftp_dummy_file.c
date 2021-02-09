@@ -85,21 +85,21 @@ struct _file_info {
 };
 
 // TEMP
-static char _uu_data[] = "This is a test
-Four score and seven years ago,
-our forefathers brought forth a new nation,
-conceived in liberty and dedicated to the
-proposition that all men are created equal.
-Now we are engaged in a great civil war, testing
-whether that nation, or any nation so conceived
-and so dedicated, can long endure.
-1111111111111111111111111111111111
-2222222222222222222222222222222222
-3333333333333333333333333333333333
-4444444444444444444444444444444444
-5555555555555555555555555555555555
-6666666666666666666666666666666666
-";
+static char _uu_data[] = "This is a test"
+    "Four score and seven years ago,"
+    "our forefathers brought forth a new nation,"
+    "conceived in liberty and dedicated to the"
+    "proposition that all men are created equal."
+    "Now we are engaged in a great civil war, testing"
+    "whether that nation, or any nation so conceived"
+    "and so dedicated, can long endure."
+    "1111111111111111111111111111111111"
+    "2222222222222222222222222222222222"
+    "3333333333333333333333333333333333"
+    "4444444444444444444444444444444444"
+    "5555555555555555555555555555555555"
+    "6666666666666666666666666666666666"
+    "";
 
 static char _f0_data[1024*1024];
 static char _f1_data[1024*1024];

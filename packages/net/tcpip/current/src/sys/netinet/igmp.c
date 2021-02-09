@@ -638,3 +638,9 @@ igmp_sendpkt(inm, type)
 
 	++igmpstat.igps_snd_reports;
 }
+
+#ifdef _KERNEL
+
+struct igmpstat igmpstat;
+#endif
+

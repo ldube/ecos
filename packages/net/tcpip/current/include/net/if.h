@@ -443,12 +443,12 @@ __END_DECLS
 		(ifa)->ifa_refcnt--; \
 	}
 
-struct ifnet_head ifnet;
-struct ifnet **ifindex2ifnet;
+extern struct ifnet_head ifnet;
+extern struct ifnet **ifindex2ifnet;
 #if 0
 struct ifnet loif[];
 #endif
-int if_index;
+extern int if_index;
 
 void	ether_ifattach __P((struct ifnet *));
 void	ether_ifdetach __P((struct ifnet *));

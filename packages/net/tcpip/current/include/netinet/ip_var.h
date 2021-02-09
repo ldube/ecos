@@ -217,8 +217,10 @@ struct	ipstat {
 #define	IP_ENCAPSULATED		0x0800		/* encapsulated already */
 #endif
 
-struct	  ipstat ipstat;
-LIST_HEAD(ipqhead, ipq)	ipq;		/* ip reass. queue */
+
+extern struct	  ipstat ipstat;
+LIST_HEAD(ipqhead, ipq);		/* ip reass. queue */
+extern struct ipqhead ipq;
 extern int ip_defttl;			/* default IP ttl */
 extern int ipforwarding;                /* IPforwarding state */
 

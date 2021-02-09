@@ -369,9 +369,9 @@ struct tcp_ident_mapping {
 };
 
 #ifdef _KERNEL
-struct	inpcbtable tcbtable;	/* head of queue of active tcpcb's */
-struct	tcpstat tcpstat;	/* tcp statistics */
-u_int32_t tcp_now;		/* for RFC 1323 timestamps */
+extern  struct	inpcbtable tcbtable;	/* head of queue of active tcpcb's */
+extern  struct	tcpstat tcpstat;	/* tcp statistics */
+extern  u_int32_t tcp_now;		/* for RFC 1323 timestamps */
 extern	int tcp_do_rfc1323;	/* enabled/disabled? */
 extern	int tcp_mssdflt;	/* default maximum segment size */
 #ifdef TCP_SACK

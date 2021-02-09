@@ -121,7 +121,7 @@ struct	domain {
 };
 
 #ifdef _KERNEL
-struct	domain *domains;
+extern struct	domain *domains;
 void domaininit __P((void));
 #endif
 

@@ -146,8 +146,8 @@ struct	udpstat {
 }
 
 #ifdef _KERNEL
-struct	inpcbtable udbtable;
-struct	udpstat udpstat;
+extern struct	inpcbtable udbtable;
+extern struct	udpstat udpstat;
 
 #if defined(INET6) && !defined(TCP6)
 void	udp6_ctlinput __P((int, struct sockaddr *, void *));

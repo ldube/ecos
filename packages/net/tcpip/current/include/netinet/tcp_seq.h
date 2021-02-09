@@ -119,7 +119,7 @@
 #define	TCP_ISSINCR	(125*1024)	/* increment for tcp_iss each second */
 
 #ifdef _KERNEL
-tcp_seq	tcp_iss;		/* tcp initial send seq # */
+extern tcp_seq	tcp_iss;		/* tcp initial send seq # */
 #endif
 
 #endif // _NETINET_TCP_SEQ_H_

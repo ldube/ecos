@@ -1080,3 +1080,11 @@ rt_timer_timer(arg)
 
 	timeout(rt_timer_timer, NULL, hz);  /* every second */
 }
+
+#ifdef _KERNEL
+
+struct	route_cb route_cb;
+struct	rtstat	rtstat;
+struct	radix_node_head *rt_tables[AF_MAX+1];
+#endif
+

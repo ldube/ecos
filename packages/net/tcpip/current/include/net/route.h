@@ -360,9 +360,9 @@ struct rttimer_queue {
 #define	ONNET_CLONING 1
 #define	NO_CLONING 2
 
-struct	route_cb route_cb;
-struct	rtstat	rtstat;
-struct	radix_node_head *rt_tables[AF_MAX+1];
+extern struct	route_cb route_cb;
+extern struct	rtstat	rtstat;
+extern struct	radix_node_head *rt_tables[AF_MAX+1];
 
 struct	socket;
 void	 route_init __P((void));

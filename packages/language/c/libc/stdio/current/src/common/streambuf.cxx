@@ -61,8 +61,8 @@
 // FUNCTIONS
     
 Cyg_ErrNo
-Cyg_StdioStreamBuffer::set_buffer( cyg_ucount32 size=BUFSIZ,
-                                   cyg_uint8 *new_buffer=NULL )
+Cyg_StdioStreamBuffer::set_buffer( cyg_ucount32 size,
+                                   cyg_uint8 *new_buffer )
 {
     
 #ifdef CYGSEM_LIBC_STDIO_DYNAMIC_SETVBUF

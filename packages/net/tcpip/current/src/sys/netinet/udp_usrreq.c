@@ -1395,3 +1395,9 @@ udp_sysctl(name, namelen, oldp, oldlenp, newp, newlen)
 	/* NOTREACHED */
 }
 #endif // CYGPKG_NET_SYSCTL
+
+#ifdef _KERNEL
+struct	inpcbtable udbtable;
+struct	udpstat udpstat;
+#endif
+

@@ -1084,3 +1084,13 @@ m_apply(m, off, len, f, fstate)
 	return (0);
 }
 
+#ifdef	_KERNEL
+
+struct	mbstat mbstat;
+union	mcluster *mclfree;
+int	max_linkhdr;			/* largest link-level header */
+int	max_protohdr;			/* largest protocol header */
+int	max_hdr;			/* largest link+protocol header */
+int	max_datalen;			/* MHLEN - max_hdr */
+
+#endif

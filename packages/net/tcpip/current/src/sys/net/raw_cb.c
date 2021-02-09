@@ -202,3 +202,6 @@ raw_bind(so, nam)
 	return (0);
 }
 #endif
+
+
+struct noname rawcb;
