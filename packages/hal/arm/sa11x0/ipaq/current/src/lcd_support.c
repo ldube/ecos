@@ -398,11 +398,13 @@ lcd_clear(void)
 #else
     pos = (LCD_HEIGHT-1);
 #endif
+#ifdef CYGSEM_IPAQ_LCD_COMM
     kbd_pos = show_xpm(banner_xpm, pos);
     curX = 0;  curY = screen_start;
     if (cursor_enable) {
         lcd_drawc(CURSOR_ON, curX-screen_pan, curY);
     }
+#endif
 }
 
 // Position cursor
