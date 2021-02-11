@@ -133,11 +133,15 @@ do_delay(int ticks)
 //
 // Fill in the details of a PCMCIA slot and initialize the device
 //
-void
+bool
 cf_hwr_init(struct cf_slot *slot)
 {
     static int int_init = 0;
     unsigned long new_state = *SA11X0_GPIO_PIN_LEVEL;
+
+    if (!jacket_present()) {
+      return false;
+    }
 
     if (!int_init) {
         int_init = 1;
@@ -190,6 +194,8 @@ cf_hwr_init(struct cf_slot *slot)
     } else {
         slot->state = CF_SLOT_STATE_Empty;
     }
+
+    return true;
 }
 
 void
@@ -212,20 +218,34 @@ cf_hwr_change_state(struct cf_slot *slot, int new_state)
 {    
     int i, ptr, len;
     unsigned char buf[256];
+    unsigned short voltset = 0;
+    bool linkup = (LINKUP_SLOT0 & 0x1800) == 0x1800 ? true : false;
 
     if (new_state == CF_SLOT_STATE_Ready) {
         if (slot->state == CF_SLOT_STATE_Inserted) {
+            if (linkup) {
+              if ((LINKUP_SLOT0 & (STATUS_VS1 | STATUS_VS2)) == (STATUS_VS1 | STATUS_VS2)) {
+                voltset = CMD_S2 | CMD_S3; // enable 5v and disable 3v
+              } else { // VS1=0 and VS2=1 => 3.3V
+                voltset = CMD_S1 | CMD_S3; // enable 3v and disable 5v
+              }
+            }
+
             ipaq_EGPIO( SA1110_EIO_OPT_PWR | SA1110_EIO_OPT | SA1110_EIO_CF_RESET,
                         SA1110_EIO_OPT_PWR_ON | SA1110_EIO_OPT_ON | SA1110_EIO_CF_RESET_DISABLE);
             do_delay(30);  // At least 300 ms
             slot->state = CF_SLOT_STATE_Powered;
             ipaq_EGPIO( SA1110_EIO_CF_RESET, SA1110_EIO_CF_RESET_ENABLE);
-            LINKUP_SLOT0 = ( CMD_RESET | CMD_APOE | CMD_SOE | CMD_S1); //Reset
+            if (linkup) {
+                LINKUP_SLOT0 = ( CMD_RESET | CMD_APOE | CMD_SOE | CMD_S1 | CMD_S2); //Reset
+            }
             do_delay(1);  // At least 10 us
             slot->state = CF_SLOT_STATE_Reset;
             ipaq_EGPIO( SA1110_EIO_CF_RESET, SA1110_EIO_CF_RESET_DISABLE);
             do_delay(5); // At least 20 ms
-            LINKUP_SLOT0 = ( CMD_APOE | CMD_SOE | CMD_S1);
+            if (linkup) {
+                LINKUP_SLOT0 = ( CMD_APOE | CMD_SOE | voltset);
+            }
             do_delay(5); // At least 20 ms
             // Wait until the card is ready to talk
             for (i = 0;  i < 10;  i++) {

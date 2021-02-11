@@ -145,8 +145,16 @@ sc_lpe_card_handler(cyg_addrword_t param)
             len = sizeof(buf);
             ptr = 0;
             if (cf_get_CIS(slot, CF_CISTPL_MANFID, buf, &len, &ptr)) {
-                manuf_id = *(short *)&buf[2];
-                //diag_printf("MANFID = 0x%x\n", *(short *)&buf[2]);
+                manuf_id = *(cyg_uint16 *)&buf[2];
+                //diag_printf("MANFID = 0x%x\n", *(cyg_uint16 *)&buf[2]);
+                if (manuf_id == 0xd601 || manuf_id == 0x274 || manuf_id == 0x45) {
+                  diag_printf("Unsupported PC Card found.\n");
+#ifndef CYGPKG_NET
+                  return false;
+#else
+                  continue;
+#endif
+                }
             } 
             ptr = 0;
             if (cf_get_CIS(slot, CF_CISTPL_VERS_1, buf, &len, &ptr)) {
@@ -217,7 +225,7 @@ sc_lpe_card_handler(cyg_addrword_t param)
                             unsigned char prom[32];
 
                             // Tell device to give up ESA
-                            DP_OUT(base, DP_DCR, 0x48);  // Bytewide access
+                            DP_OUT(base, DP_DCR, DP_DCR_LS | DP_DCR_FIFO_4); // Bytewide access
                             DP_OUT(base, DP_RBCH, 0);    // Remote byte count
                             DP_OUT(base, DP_RBCL, 0);
                             DP_OUT(base, DP_ISR, 0xFF);  // Clear any pending interrupts
@@ -297,7 +305,10 @@ cyg_sc_lpe_init(struct cyg_netdevtab_entry *tab)
     dp83902a_priv_data_t *dp = (dp83902a_priv_data_t *)sc->driver_private;
     struct cf_slot* slot;
 
-    cf_init();  // Make sure Compact Flash subsystem is initialized
+    // Make sure Compact Flash subsystem is initialized
+    if (!cf_init()) {
+      return false;
+    }
     slot = dp->plf_priv = (void*)cf_get_slot(0);
     dp->tab = tab;
 

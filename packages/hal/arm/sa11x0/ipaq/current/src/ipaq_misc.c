@@ -145,6 +145,10 @@ plf_hardware_init(void)
     *SA1110_GPCLK_CONTROL_0 = SA1110_GPCLK_SUS_UART;
     *SA11X0_PPC_PIN_ASSIGNMENT &= ~SA11X0_PPC_UART_PIN_REASSIGNED;
     atmel_init();
+
+    // Configure the jacket detection pin
+    *SA11X0_GPIO_PIN_DIRECTION      &= ~JACKET_DETECT; // input
+    *SA11X0_GPIO_ALTERNATE_FUNCTION &= ~JACKET_DETECT; // normal gpio
 }
 
 //
@@ -162,3 +166,7 @@ plf_if_init(void)
 #endif
 }
 
+int jacket_present(void) // return non-zero if jacket is present
+{
+  return JACKET_DETECT & *SA11X0_GPIO_PIN_LEVEL ? 0 : 1;
+}

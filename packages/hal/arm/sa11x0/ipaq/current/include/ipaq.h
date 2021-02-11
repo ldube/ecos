@@ -58,6 +58,8 @@ extern unsigned short _ipaq_LCD_params[(4*2)+1];  // Various LCD parameters
 
 extern void ipaq_EGPIO(unsigned long mask, unsigned long value);
 
+extern int jacket_present(void); // return non-zero if jacket is present
+
 #endif
 
 // 
@@ -133,6 +135,8 @@ extern void ipaq_EGPIO(unsigned long mask, unsigned long value);
 #define SA1110_GPIO_CF_DETECT       0x00020000     // 0 = Compact Flash detect
 #define SA1110_GPIO_CF_PRESENT      SA1110_LOGIC_ZERO(SA1110_GPIO_CF_DETECT)
 #define SA1110_GPIO_CF_ABSENT       SA1110_LOGIC_ONE(SA1110_GPIO_CF_DETECT)
+
+#define JACKET_DETECT               SA11X0_GPIO_PIN_27
 
 //
 // LCD Controller

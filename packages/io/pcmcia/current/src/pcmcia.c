@@ -54,7 +54,7 @@
 static struct cf_slot cf_slots[CF_NUM_SLOTS];
 
 // Implementation routines
-void cf_hwr_init(struct cf_slot *slot);
+bool cf_hwr_init(struct cf_slot *slot);
 void cf_hwr_change_state(struct cf_slot *slot, int desired_state);
 void cf_hwr_clear_interrupt(struct cf_slot *slot);
 
@@ -273,14 +273,19 @@ cf_get_slot(int indx)
 //
 // Initialize all PCMCIA (Compact Flash) slots
 //
-void
+bool
 cf_init(void)
 {
     int i;
-    for (i = 0;  i < CF_NUM_SLOTS; i++) {
+    bool retval = false;
+    for (i = 0; i < CF_NUM_SLOTS; i++) {
         cf_slots[i].index = i;
-        cf_hwr_init(&cf_slots[i]);
+        retval = cf_hwr_init(&cf_slots[i]);
+        if (!retval) {
+          break;
+        }
     }
+    return retval;
 }
 
 //
