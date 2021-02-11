@@ -94,4 +94,7 @@ cdl_option CYGNUM_HAL_VIRTUAL_VECTOR_CONSOLE_CHANNEL_BAUD {
     user_value 115200
 };
 
+cdl_option CYGSEM_IPAQ_LCD_COMM {
+    user_value 0
+};
 
