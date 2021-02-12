@@ -151,6 +151,21 @@ plf_hardware_init(void)
     *SA11X0_GPIO_ALTERNATE_FUNCTION &= ~JACKET_DETECT; // normal gpio
 }
 
+#include CYGHWR_MEMORY_LAYOUT_H
+typedef void code_fun(void);
+void ipaq_program_new_stack(void *func)
+{
+    register CYG_ADDRESS stack_ptr asm("sp");
+    register CYG_ADDRESS old_stack asm("r4");
+    register code_fun *new_func asm("r0");
+    old_stack = stack_ptr;
+    stack_ptr = CYGMEM_REGION_ram + CYGMEM_REGION_ram_SIZE - sizeof(CYG_ADDRESS);
+    new_func = (code_fun*)func;
+    new_func();
+    stack_ptr = old_stack;
+    return;
+}
+
 //
 // Support for platform specific I/O channels
 //
