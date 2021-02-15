@@ -658,7 +658,7 @@ dp83902a_TxEvent(struct eth_drv_sc *sc)
 
 // Read the tally counters to clear them.  Called in response to a CNT
 // interrupt.
-static int
+static void
 dp83902a_ClearCounters(struct eth_drv_sc *sc)
 {
     struct dp83902a_priv_data *dp = (struct dp83902a_priv_data *)sc->driver_private;

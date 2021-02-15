@@ -355,6 +355,7 @@ do_exec(int argc, char *argv[])
                   "mov r1,r7;" 
                   "movs pc,lr" : : );
  end1:
+  return;
 }
 
 #endif // HAL_PLATFORM_MACHINE_TYPE - otherwise we do not support this stuff...

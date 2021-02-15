@@ -303,7 +303,7 @@ public:
         );
 
     // Re-initialize the thread back to it's initial state.
-    void Cyg_Thread::reinitialize();
+    void reinitialize();
     
     ~Cyg_Thread();
     

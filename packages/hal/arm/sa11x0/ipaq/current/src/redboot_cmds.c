@@ -51,6 +51,11 @@
 #include <cyg/hal/hal_intr.h>
 #include <cyg/hal/hal_cache.h>
 
+static void do_gpio(int argc,char *argv[]);
+static void do_egpio(int argc,char *argv[]);
+static void do_mem(int argc,char *argv[]);
+static void do_physaddr(int argc,char *argv[]);
+
 // Exported CLI function(s)
 RedBoot_cmd("gpio",
 	    "Query and/or set the GPIO status",

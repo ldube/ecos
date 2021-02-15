@@ -154,7 +154,7 @@ static void send(struct eth_drv_sc *sc, struct eth_drv_sg *sg_list, int sg_len, 
 static void recv(struct eth_drv_sc *sc, struct eth_drv_sg *sg_list, int sg_len); \
 static void deliver(struct eth_drv_sc *sc); \
 static void poll(struct eth_drv_sc *sc); \
-static int  int_vector(struct eth_drv_sc *sc); \
+int  int_vector(struct eth_drv_sc *sc); \
 static struct eth_hwr_funs sc##_funs = {        \
     start,                                      \
     stop,                                       \

@@ -60,7 +60,7 @@ typedef struct cyg_netdevtab_entry {
 extern cyg_netdevtab_entry_t __NETDEVTAB__[], __NETDEVTAB_END__;
 
 #define NETDEVTAB_ENTRY(_l,_name,_init,_instance)  \
-static bool _init(struct cyg_netdevtab_entry *tab);                  \
+bool _init(struct cyg_netdevtab_entry *tab);                  \
 cyg_netdevtab_entry_t _l CYG_HAL_TABLE_ENTRY(netdev) = {             \
    _name,                                                            \
    _init,                                                            \

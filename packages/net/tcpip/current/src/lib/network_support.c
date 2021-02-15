@@ -321,8 +321,8 @@ init_all_network_interfaces(void)
                        string(CYGHWR_NET_DRIVER_ETH0_ADDRS_SERVER));
         show_bootp(eth0_name, &eth0_bootp_data);
 #endif
-    bail_eth0:
     }
+bail_eth0:
 #endif // CYGHWR_NET_DRIVER_ETH0
 #ifdef CYGHWR_NET_DRIVER_ETH1
     if ( ! eth1_up ) { // Make this call idempotent
@@ -372,8 +372,8 @@ init_all_network_interfaces(void)
                        string(CYGHWR_NET_DRIVER_ETH1_ADDRS_SERVER));
         show_bootp(eth1_name, &eth1_bootp_data);
 #endif
-    bail_eth1:
     }
+bail_eth1:
 #endif // CYGHWR_NET_DRIVER_ETH1
 #ifdef CYGHWR_NET_DRIVER_ETH0
 #ifndef CYGHWR_NET_DRIVER_ETH0_MANUAL
