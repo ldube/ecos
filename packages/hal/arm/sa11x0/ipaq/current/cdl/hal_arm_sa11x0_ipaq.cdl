@@ -198,7 +198,7 @@ cdl_package CYGPKG_HAL_ARM_SA11X0_IPAQ {
             display "Global command prefix"
             flavor  data
             no_define
-            default_value { "arm-elf" }
+            default_value { "arm-none-eabi" }
             description "
                 This option specifies the command prefix used when
                 invoking the build tools."
@@ -208,7 +208,7 @@ cdl_package CYGPKG_HAL_ARM_SA11X0_IPAQ {
             display "Global compiler flags"
             flavor  data
             no_define
-            default_value { "-mcpu=strongarm1100 -Wall -Wpointer-arith -Wstrict-prototypes -Winline -Wundef -Woverloaded-virtual -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fvtable-gc -finit-priority" }
+            default_value { "-march=armv4 -mtune=strongarm1110 -fpermissive -Wall -Wpointer-arith -Wstrict-prototypes -Winline -Wundef -Woverloaded-virtual -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -fno-use-cxa-atexit" }
             description   "
                 This option controls the global compiler flags which are used to
                 compile all packages by default. Individual packages may define
@@ -219,7 +219,7 @@ cdl_package CYGPKG_HAL_ARM_SA11X0_IPAQ {
             display "Global linker flags"
             flavor  data
             no_define
-            default_value { "-Wl,--gc-sections -Wl,-static -g -O2 -nostdlib" }
+            default_value { "-Wl,--gc-sections -Wl,-static -g -O2 -nostdlib -march=armv4 -Wl,--fix-v4bx" }
             description   "
                 This option controls the global linker flags. Individual
                 packages may define options which override these global flags."
