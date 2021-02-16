@@ -79,7 +79,7 @@ cdl_package CYGPKG_LIBC_STDLIB {
 
         cdl_option CYGIMP_LIBC_STDLIB_INLINE_ABS {
             display       "abs() / labs()"
-            default_value 1
+            default_value 0
             no_define
             requires      { CYGBLD_ISO_STDLIB_ABS_HEADER == \
                             "<cyg/libc/stdlib/abs.inl>" }
@@ -87,7 +87,7 @@ cdl_package CYGPKG_LIBC_STDLIB {
 
         cdl_option CYGIMP_LIBC_STDLIB_INLINE_DIV {
             display       "div() / ldiv()"
-            default_value 1
+            default_value 0
             no_define
             requires      { CYGBLD_ISO_STDLIB_DIV_HEADER == \
                             "<cyg/libc/stdlib/div.inl>" }
@@ -95,7 +95,7 @@ cdl_package CYGPKG_LIBC_STDLIB {
 
         cdl_option CYGIMP_LIBC_STDLIB_INLINE_ATOX {
             display       "atof() / atoi() / atol()"
-            default_value 1
+            default_value 0
             no_define
             requires      { CYGBLD_ISO_STDLIB_STRCONV_HEADER == \
                             "<cyg/libc/stdlib/atox.inl>" }
@@ -131,7 +131,7 @@ cdl_package CYGPKG_LIBC_STDLIB {
             display       "Random number seed"
             flavor        data
             legal_values  0 to 0x7fffffff
-            default_value 1
+            default_value 0
             description   "
                 This selects the initial random number seed for
                 rand()'s pseudo-random number generator. For

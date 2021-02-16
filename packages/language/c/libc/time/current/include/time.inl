@@ -102,17 +102,7 @@
 # define CYGPRI_LIBC_TIME_LOCALTIME_INLINE extern __inline__
 #endif
 
-#ifndef CYGPRI_LIBC_TIME_GETZONEOFFSETS_INLINE
-# define CYGPRI_LIBC_TIME_GETZONEOFFSETS_INLINE extern __inline__
-#endif
 
-#ifndef CYGPRI_LIBC_TIME_SETZONEOFFSETS_INLINE
-# define CYGPRI_LIBC_TIME_SETZONEOFFSETS_INLINE extern __inline__
-#endif
-
-#ifndef CYGPRI_LIBC_TIME_SETDST_INLINE
-# define CYGPRI_LIBC_TIME_SETDST_INLINE extern __inline__
-#endif
 
 #define CYGNUM_LIBC_TIME_EPOCH_WDAY       4  // Jan 1st 1970 was a Thursday
 

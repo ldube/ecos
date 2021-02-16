@@ -52,6 +52,7 @@
 
 #include <cyg/infra/cyg_type.h> // common type definitions and support
 #include <stdarg.h>             // va_list from compiler
+#include <string.h>
 
 // CONSTANTS
 

@@ -183,42 +183,42 @@ cdl_package CYGPKG_LIBC_TIME {
     
         cdl_option CYGIMP_LIBC_TIME_ASCTIME_INLINE {
             display       "asctime()"
-            default_value 1
+            default_value 0
             description   "
                 Allow the asctime() function to be inlined"
         }
     
         cdl_option CYGIMP_LIBC_TIME_CTIME_INLINE {
             display       "ctime()"
-            default_value 1
+            default_value 0
             description   "
                 Allow the ctime() function to be inlined"
         }
     
         cdl_option CYGIMP_LIBC_TIME_DIFFTIME_INLINE {
             display       "difftime()"
-            default_value 1
+            default_value 0
             description   "
                 Allow the difftime() function to be inlined"
         }
     
         cdl_option CYGIMP_LIBC_TIME_GMTIME_INLINE {
             display       "gmtime()"
-            default_value 1
+            default_value 0
             description   "
                 Allow the gmtime() function to be inlined"
         }
     
         cdl_option CYGIMP_LIBC_TIME_LOCALTIME_INLINE {
             display       "localtime()"
-            default_value 1
+            default_value 0
             description   "
                 Allow the localtime() function to be inlined"
         }
     
         cdl_option CYGIMP_LIBC_TIME_MKTIME_INLINE {
             display       "mktime()"
-            default_value 1
+            default_value 0
             description   "
                 Allow the mktime() function to be inlined"
         }
@@ -226,7 +226,7 @@ cdl_package CYGPKG_LIBC_TIME {
         cdl_option CYGIMP_LIBC_TIME_ASCTIME_R_INLINE {
             display       "asctime_r()"
             requires      CYGFUN_LIBC_TIME_POSIX
-            default_value 1
+            default_value 0
             description   "
                 Allow the asctime_r() function to be inlined"
         }
@@ -234,7 +234,7 @@ cdl_package CYGPKG_LIBC_TIME {
         cdl_option CYGIMP_LIBC_TIME_CTIME_R_INLINE {
             display       "ctime_r()"
             requires      CYGFUN_LIBC_TIME_POSIX
-            default_value 1
+            default_value 0
             description   "
                 Allow the ctime_r() function to be inlined"
         }
@@ -242,7 +242,7 @@ cdl_package CYGPKG_LIBC_TIME {
         cdl_option CYGIMP_LIBC_TIME_GMTIME_R_INLINE {
             display       "gmtime_r()"
             requires      CYGFUN_LIBC_TIME_POSIX
-            default_value 1
+            default_value 0
             description   "
                 Allow the gmtime_r() function to be inlined"
         }
@@ -250,7 +250,7 @@ cdl_package CYGPKG_LIBC_TIME {
         cdl_option CYGIMP_LIBC_TIME_LOCALTIME_R_INLINE {
             display       "localtime_r()"
             requires      CYGFUN_LIBC_TIME_POSIX
-            default_value 1
+            default_value 0
             description   "
                 Allow the localtime_r() function to be inlined"
         }

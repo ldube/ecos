@@ -251,7 +251,10 @@ strftime( char *__s, size_t __maxsize, const char *__format,
 // or disabled. The offsets are in time_t's
 //
 
-extern void
+#ifndef CYGPRI_LIBC_TIME_SETZONEOFFSETS_INLINE
+# define CYGPRI_LIBC_TIME_SETZONEOFFSETS_INLINE static __inline__
+#endif
+CYGPRI_LIBC_TIME_SETZONEOFFSETS_INLINE void
 cyg_libc_time_setzoneoffsets( time_t __stdoffset, time_t __dstoffset );
 
 ////////////////////////////
@@ -261,7 +264,10 @@ cyg_libc_time_setzoneoffsets( time_t __stdoffset, time_t __dstoffset );
 // This function sets the state of Daylight Savings Time: on, off, or unknown
 //
 
-extern void
+#ifndef CYGPRI_LIBC_TIME_SETDST_INLINE
+# define CYGPRI_LIBC_TIME_SETDST_INLINE static __inline__
+#endif
+CYGPRI_LIBC_TIME_SETDST_INLINE void
 cyg_libc_time_setdst( Cyg_libc_time_dst __state );
 
 
@@ -273,8 +279,10 @@ cyg_libc_time_setdst( Cyg_libc_time_dst __state );
 // and the offsets of both STD and DST
 // The offsets are both in time_t's
 //
-
-extern Cyg_libc_time_dst
+#ifndef CYGPRI_LIBC_TIME_GETZONEOFFSETS_INLINE
+# define CYGPRI_LIBC_TIME_GETZONEOFFSETS_INLINE static __inline__
+#endif
+CYGPRI_LIBC_TIME_GETZONEOFFSETS_INLINE Cyg_libc_time_dst
 cyg_libc_time_getzoneoffsets( time_t *__stdoffset, time_t *__dstoffset );
 
 /////////////////////////////

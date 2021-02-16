@@ -93,8 +93,8 @@ FUNC_START_ARM(hal_thread_switch_context, r2)
         b       hal_thread_load_context_ARM // skip mode switch stuff
 #endif
 
-        # Now load the destination thread by dropping through
-        # to hal_thread_load_context
+//        # Now load the destination thread by dropping through
+//        # to hal_thread_load_context
         
 // ----------------------------------------------------------------------------
 //  hal_thread_load_context
