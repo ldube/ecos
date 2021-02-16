@@ -170,6 +170,30 @@ cyg_bool cyg_hal_stop_constructors;
 typedef void (*pfunc) (void);
 extern pfunc __CTOR_LIST__[];
 extern pfunc __CTOR_END__[];
+extern pfunc __preinit_array_start [];
+extern pfunc __preinit_array_end [];
+extern pfunc __init_array_start [];
+extern pfunc __init_array_end [];
+void _init();
+void _fini();
+
+externC void diag_printf(const char *, ...);
+static void __libc_init_array()
+{
+#if __GNUC__ > 3
+    size_t count, i;
+
+    count = __preinit_array_end - __preinit_array_start;
+    for (i = 0; i < count; i++) {
+        __preinit_array_start[i]();
+    }
+
+    count = __init_array_end - __init_array_start;
+    for (i = 0; i < count; i++) {
+        __init_array_start[i]();
+    }
+#endif
+}
 
 void
 cyg_hal_invoke_constructors (void)
@@ -190,6 +214,7 @@ cyg_hal_invoke_constructors (void)
 
     for (p = &__CTOR_END__[-1]; p >= __CTOR_LIST__; p--)
         (*p) ();
+    __libc_init_array();
 #endif
 }
 

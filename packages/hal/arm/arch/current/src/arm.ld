@@ -219,6 +219,17 @@ OUTPUT_FORMAT(elf32-bigarm)
     . = ALIGN (4); \
     __CTOR_LIST__ = ABSOLUTE (.); KEEP (*(SORT (.ctors*))) __CTOR_END__ = ABSOLUTE (.); \
     __DTOR_LIST__ = ABSOLUTE (.); KEEP (*(SORT (.dtors*))) __DTOR_END__ = ABSOLUTE (.); \
+    PROVIDE_HIDDEN (__preinit_array_start = .); \
+    KEEP (*(.preinit_array)) \
+    PROVIDE_HIDDEN (__preinit_array_end = .); \
+    PROVIDE_HIDDEN (__init_array_start = .); \
+    KEEP (*(SORT(.init_array.*))) \
+    KEEP (*(.init_array)) \
+    PROVIDE_HIDDEN (__init_array_end = .); \
+    PROVIDE_HIDDEN (__fini_array_start = .); \
+    KEEP (*(.fini_array)) \
+    KEEP (*(SORT(.fini_array.*))) \
+    PROVIDE_HIDDEN (__fini_array_end = .); \
     *(.dynamic) *(.sdata*) *(.sbss*) \
     . = ALIGN (4); *(.2ram.*) } \
     > _region_ \

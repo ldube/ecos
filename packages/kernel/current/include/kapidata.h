@@ -327,7 +327,7 @@ typedef struct
 } cyg_schedthread;
 
 #define CYG_THREADTIMER_MEMBERS \
-    cyg_alarm           alarm;  \
+    CYG_ALARM_MEMBERS  \
     cyg_thread          *thread;
 
 /*---------------------------------------------------------------------------*/
