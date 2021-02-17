@@ -146,7 +146,7 @@
 # define NULL 0
 #endif
 
-#ifndef __cplusplus
+#if !defined(__cplusplus) && !defined(__bool_true_false_are_defined)
 
 typedef cyg_halbool bool;
 
