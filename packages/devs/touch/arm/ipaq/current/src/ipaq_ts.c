@@ -108,6 +108,10 @@ static int   _event_put, _event_get;
 static bool  pen_down = false;
 static struct _event _events[MAX_EVENTS];
 
+#define AVG_EVENTS 4
+static int   f_events;
+static int   av_x, av_y;
+
 static bool _is_open = false;
 #ifdef DEBUG_RAW_EVENTS
 static unsigned char _ts_buf[512];
@@ -140,11 +144,29 @@ ts_handler(atmel_pkt *pkt)
         x = lastX;
         y = lastY;
         pen_down = false;
+        f_events = 0;
+        av_x = 0;
+        av_y = 0;
     } else {
         // Some sort of event with the pen down        
         x = lastX = (dp[1] << 8) | dp[2];
         y = lastY = (dp[3] << 8) | dp[4];
         pen_down = true;
+#if AVG_EVENTS > 0
+        if (f_events < AVG_EVENTS) {
+          f_events++;
+
+          av_x += x;
+          av_y += y;
+          if (f_events == AVG_EVENTS) {
+            x = av_x / AVG_EVENTS;
+            y = av_y / AVG_EVENTS;
+            f_events = 0;
+            av_x = 0;
+            av_y = 0;
+          } else return;
+        }
+#endif
     }
     if (num_events < MAX_EVENTS) {
         num_events++;
@@ -168,8 +190,8 @@ typedef struct {
     short span;
 } bounds;
 
-static bounds xBounds = {1024, 0, 1024};
-static bounds yBounds = {1024, 0, 1024};
+static bounds xBounds = { 64, 992, 928};
+static bounds yBounds = {193, 914, 721};
 
 static Cyg_ErrNo 
 ts_read(cyg_io_handle_t handle, 
