@@ -457,3 +457,22 @@ atmel_check(void)
 }
 RedBoot_idle(atmel_check, RedBoot_BEFORE_NETIO);
 #endif
+
+static void
+led_ack(atmel_pkt *pkt)
+{
+}
+
+void
+led_blink(void)
+{
+    unsigned char cmd[4];
+
+    atmel_register(ATMEL_CMD_LED, led_ack);
+    cmd[0] = 1;    // green
+    cmd[1] = 255;  // total
+    cmd[2] = 1;    // on time
+    cmd[3] = 254;   // off time
+
+    atmel_send(ATMEL_CMD_LED, cmd, 4);
+}
