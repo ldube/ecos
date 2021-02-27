@@ -153,7 +153,8 @@ cdl_package CYGPKG_IO_FILEIO {
             display "Fileio tests"
             flavor  data
             no_define
-            calculated { "tests/testfs.c tests/fileio1.c tests/socket.c tests/select.c tests/stdio.c" }
+#            calculated { "tests/testfs.c tests/fileio1.c tests/socket.c tests/select.c tests/stdio.c" }
+            calculated { "tests/testfs.c tests/fileio1.c tests/socket.c tests/select.c" }
             description   "
                 This option specifies the set of tests for the FileIO package."
         }

@@ -51,7 +51,7 @@
 
 /* The outline implementation will override this to prevent inlining */
 #ifndef CYGPRI_LIBC_I18N_CTYPE_INLINE
-# define CYGPRI_LIBC_I18N_CTYPE_INLINE extern __inline__
+# define CYGPRI_LIBC_I18N_CTYPE_INLINE static __inline__
 #endif
 
 /* FUNCTIONS */

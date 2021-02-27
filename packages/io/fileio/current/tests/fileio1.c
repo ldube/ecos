@@ -83,7 +83,7 @@ diag_printf("<INFO>: " #_fn "() returned %d %s\n", _res, _res<0?strerror(errno):
 
 //==========================================================================
 
-static char *strcat( char *s1, const char *s2 )
+static char *local_strcat( char *s1, const char *s2 )
 {
     char *s = s1;
     while( *s1 ) s1++;
@@ -120,11 +120,11 @@ static void listdir( char *name, int statp )
             {
                 strcpy(fullname, name );
                 if( !(name[0] == '/' && name[1] == 0 ) )
-                    strcat(fullname, "/" );
+                    local_strcat(fullname, "/" );
             }
             else fullname[0] = 0;
             
-            strcat(fullname, entry->d_name );
+            local_strcat(fullname, entry->d_name );
             
             err = stat( fullname, &sbuf );
             if( err < 0 )
