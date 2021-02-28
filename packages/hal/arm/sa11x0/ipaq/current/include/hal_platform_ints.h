@@ -93,4 +93,15 @@
       normal processing. */                                                  \
 }
 
+// Hardware specific test exit code. 
+//
+#define CYGHWR_TEST_PROGRAM_EXIT()              \
+{                                               \
+  *SA11X0_OSSR = SA11X0_OSSR_TIMER3; \
+  *SA11X0_OIER |= SA11X0_OIER_TIMER3; \
+  *SA11X0_OWER  = SA11X0_OWER_ENABLE; \
+  *SA11X0_OSMR3 = *SA11X0_OSCR + (3686400); \
+  for(;;);                          \
+}
+
 #endif // CYGONCE_HAL_PLATFORM_INTS_H
