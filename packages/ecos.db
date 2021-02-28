@@ -389,6 +389,14 @@ package CYGPKG_DEVS_KBD_IPAQ {
            This package contains hardware support for the keyboard buttons
 	   on the Compaq iPAQ Pocket PC."
 }
+
+package CYGPKG_DEVS_SOUND_ARM_IPAQ {
+	alias		{ "Sound driver for iPAQ" sound_ipaq ipaq_sound }
+	directory	devs/sound/arm/ipaq
+	script		sound_ipaq.cdl
+	description	"A sound device driver used in the Compaq iPAQ"
+}
+
 package CYGPKG_IO_SERIAL_ARM_EBSA285 {
     alias 	      { "Intel EBSA285 serial driver"
                         devs_serial_arm_ebsa285 ebsa285_serial_driver }

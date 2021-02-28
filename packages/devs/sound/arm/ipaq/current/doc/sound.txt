@@ -1,0 +1,29 @@
+A device driver for the iPAQ UDA1341 Sound Chip
+===============================================
+
+THE SOUND DEVICE
+----------------------
+
+By default, named '/dev/sound'.
+
+See sound_test.c for examples of usage.
+
+This device supports up to 3 simultaneous users, but no more than 1 per thread.
+
+Every user must set a priority and a new priority will displace an old one.
+
+All sound settings are held independently for each channel.
+
+The UDA1341 is powered up when the first user sets a priority and powered down
+ when the last user sets close.
+
+Note the current arrangements to enable this driver to work with and without 
+memory protection.
+
+This driver currently only supports sound output - no microphone support is
+provided. 
+
+Only basic control of the UDA1341 is provided, cyg_io_lookup, cyg_io_set_config
+ to set priority (0 highest, 2 lowest), precision (16, 18, 20 bits), speed 
+(8000, 11025, 16000, 22050, 32000, 44100, 48000), gain (0 lowest, 99 highest),
+flush, close, pause and resume. Only 2 channels and PCM encoding is supported.
