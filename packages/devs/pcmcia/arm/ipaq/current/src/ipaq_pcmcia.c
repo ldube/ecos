@@ -213,7 +213,7 @@ cf_hwr_poll(struct cf_slot *slot)
 // Transition the card/slot to a new state
 // note: currently only supports transitions to Ready, Empty
 //
-bool
+void
 cf_hwr_change_state(struct cf_slot *slot, int new_state)
 {    
     int i, ptr, len;

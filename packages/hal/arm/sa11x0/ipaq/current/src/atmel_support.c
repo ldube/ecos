@@ -82,7 +82,7 @@ int atmel_putq_put, atmel_putq_get;
 
 bool atmel_use_ints;
 
-bool
+void
 atmel_putc(unsigned char c)
 {
     atmel_putq[atmel_putq_put++] = c;
@@ -325,6 +325,7 @@ atmel_send(int cmd, unsigned char *data, int len)
     *dp = cksum;
     pkt.len = len + 3;
     atmel_pkt_send(&pkt);
+    return true;
 }
 
 #define MAX_TS_EVENTS      32
@@ -338,7 +339,6 @@ ts_event_handler(atmel_pkt *pkt)
     unsigned char *buf = pkt->data;
     static bool up = true;
     static int down_count = 0;
-    static short last_x, last_y;
     struct ts_event *tse;
 
     if (num_ts_events == MAX_TS_EVENTS) {
@@ -452,7 +452,7 @@ key_get_event(struct key_event *ke)
 #ifdef CYGPKG_REDBOOT
 
 void
-atmel_check(void)
+atmel_check(bool b)
 {
 }
 RedBoot_idle(atmel_check, RedBoot_BEFORE_NETIO);
