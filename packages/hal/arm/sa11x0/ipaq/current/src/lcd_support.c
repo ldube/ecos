@@ -51,6 +51,9 @@
 #include <cyg/hal/lcd_support.h>
 #include <cyg/hal/atmel_support.h>
 #include <cyg/hal/hal_cache.h>
+#include <cyg/hal/drv_api.h>
+
+#include <string.h>
 
 #ifdef CYGPKG_ISOINFRA
 # include <pkgconf/isoinfra.h>
@@ -287,8 +290,9 @@ lcd_init(int depth)
     *SA1110_LCCR0 = 0xB9;     // Color
     ipaq_EGPIO(SA1110_EIO_LCD_3V3|SA1110_EIO_LCD_CTRL|SA1110_EIO_LCD_5V|SA1110_EIO_LCD_VDD,
 	    SA1110_EIO_LCD_3V3_ON|SA1110_EIO_LCD_CTRL_ON|SA1110_EIO_LCD_5V_ON|SA1110_EIO_LCD_VDD_ON);
+
     lcd_clear();
-    lcd_brightness(31);
+    lcd_brightness(get_model() == MODEL_H3600 ? 31 : DUTY_MIN);
 }
 
 // Get information about the frame buffer
@@ -314,19 +318,75 @@ lcd_brightness_ack(atmel_pkt *pkt)
 {
 }
 
+
+static void ipaq_blpwr(bool on)
+{
+  if (on)
+  {
+    PIOC_DATA |= H3800_BLPWR_ON;
+  }
+  else
+  {
+    PIOC_DATA &= ~H3800_BLPWR_ON;
+  }
+}
+
+int h3800_bl_ctrl(int level)
+{
+  if (level == 0)
+  {
+    ipaq_blpwr(false);
+    A2_PWM0_TBASE &= ~A2_PWM_TBASE_EN;
+    A2_CLOCK_EN &= ~A2_CLK_PWM;
+  }
+  else
+  {
+    if (DUTY_MAX < level)
+    {
+        level = DUTY_MAX;
+    }
+    if (DUTY_MIN > level)
+    {
+       level = DUTY_MIN;
+    }
+    A2_CLOCK_EN |= A2_CLK_EX1;
+    A2_CLOCK_EN |= A2_CLK_PWM;
+
+    A2_PWM0_DUTY = level;
+    A2_PWM0_PERIOD = 0x40;
+    A2_PWM0_TBASE = 8;
+    A2_PWM0_TBASE |= A2_PWM_TBASE_EN;
+    ipaq_blpwr(true);
+  }
+  return level;
+}
+
 static int _lcd_brightness;
 
 void
 lcd_brightness(int level)
 {
+
+  if (get_model() == MODEL_H3600)
+  {
     unsigned char cmd[3];
 
     atmel_register(ATMEL_CMD_LIGHT, lcd_brightness_ack);
     cmd[0] = 1;  // LCD magic
     cmd[1] = (level > 0) ? 1 : 0;  // Turn light on
     cmd[2] = level;
-    if (level) _lcd_brightness = level;
     atmel_send(ATMEL_CMD_LIGHT, cmd, 3);
+  }
+  else if (get_model() == MODEL_H3800)
+  {
+    level = h3800_bl_ctrl(level);
+  }
+  if (level) _lcd_brightness = level;
+}
+
+int lcd_get_brightness(void)
+{
+  return _lcd_brightness;
 }
 
 // Clear screen
@@ -487,7 +547,7 @@ static void
 lcd_scroll(void)
 {
     int row, col;
-    cyg_uint8 *c1, *c2;
+    char *c1, *c2;
 
     // First scroll up the virtual screen
     for (row = (screen_start+1);  row < screen_height;  row++) {
@@ -683,6 +743,7 @@ lcd_vprintf(void (*putc)(cyg_int8), const char *fmt0, va_list ap)
             }
         }
     }
+    return 0; // FIXME should return count ?
 }
 
 int
@@ -857,7 +918,6 @@ max(int x, int y)
 static cyg_bool
 lcd_comm_getc_nonblock(void* __ch_data, cyg_uint8* ch)
 {
-    static bool pen_down = false;
     static bool waiting_for_pen_down = true;
     static int  total_events = 0;
     static int  pen_idle;
@@ -866,11 +926,16 @@ lcd_comm_getc_nonblock(void* __ch_data, cyg_uint8* ch)
     struct key_event ke;
 //#define KBD_DEBUG
 #ifdef KBD_DEBUG
+    static bool pen_down = false;
     static bool dump_info = false;
 #endif
 #define PEN_IDLE_TIMEOUT 50000
 #define MIN_KBD_EVENTS   10
 
+    if (get_model() != MODEL_H3600)
+    {
+      return false;
+    }
     // See if any buttons have been pushed
     if (key_get_event(&ke)) {
         if ((ke.button_info & ATMEL_BUTTON_STATE) == ATMEL_BUTTON_STATE_UP) {
@@ -918,12 +983,12 @@ lcd_comm_getc_nonblock(void* __ch_data, cyg_uint8* ch)
         if (ts_get_event(&tse)) {
             lcd_on(true);
             if (!tse.up) {
-                pen_down = true;
                 waiting_for_pen_down = false;
                 totalX = totalY = 0;
                 total_events = 0;
                 pen_idle = PEN_IDLE_TIMEOUT;
 #ifdef KBD_DEBUG
+                pen_down = true;
                 if (dump_info) {
                     int cur = start_console(0);
                     diag_printf("start pen: %d, waiting: %d, total: %d\n", pen_down, waiting_for_pen_down, total_events);
@@ -937,12 +1002,13 @@ lcd_comm_getc_nonblock(void* __ch_data, cyg_uint8* ch)
     // While the pen is down, accumulate some data
     if (ts_get_event(&tse)) {
         pen_idle = PEN_IDLE_TIMEOUT;
+#ifdef KBD_DEBUG
+        pen_down = tse.up ? false : true;
+#endif
         if (tse.up) {
-            pen_down = false;
             waiting_for_pen_down = true;
         } else {
             total_events++;
-            pen_down = true;
 #ifdef PORTRAIT_MODE
             totalX += tse.y;
             totalY += tse.x;
@@ -953,9 +1019,9 @@ lcd_comm_getc_nonblock(void* __ch_data, cyg_uint8* ch)
         }
     } else {
         if (--pen_idle == 0) {
-            pen_down = false;
             waiting_for_pen_down = true;
 #ifdef KBD_DEBUG
+            pen_down = false;
             if (dump_info) {
                 int cur = start_console(0);
                 diag_printf("going idle\n");
@@ -1164,8 +1230,8 @@ lcd_comm_isr(void *__ch_data, int* __ctrlc,
             *__ctrlc = 1;
         }
     }
-    return CYG_ISR_HANDLED;
 #endif
+    return CYG_ISR_HANDLED;
 }
 
 static bool
@@ -1177,7 +1243,7 @@ init_kbd_coord(int indx, char *prompt_char)
     struct ts_event tse;
     struct key_event ke;
     bool pen_down;
-    int i, down_timer, total_events;
+    int i, total_events;
     int timeout = 100000;
     unsigned long totalX, totalY;
 
@@ -1188,9 +1254,13 @@ init_kbd_coord(int indx, char *prompt_char)
     lcd_moveto(off2, (screen_height/2)+3);
     lcd_printf("message disappears");
     pen_down = false;
-    down_timer = 0;
     total_events = 0;
     totalX = totalY = 0;
+
+    if (get_model() != MODEL_H3600)
+    {
+      return true;
+    }
     // Wait for a pen-down event
     while (!pen_down) {
         if (ts_get_event(&tse)) {
@@ -1295,7 +1365,7 @@ lcd_comm_init(void)
         init = 1;
 
         // Pick up parameters for virtual keyboard from RAM
-        cksum = (unsigned short)&_ipaq_LCD_params[0];
+        cksum = _ipaq_LCD_params[0];
         for (i = 0;  i < 4;  i++) {
             param = _ipaq_LCD_params[i*2];
             kbd_limits[i].x = param;
@@ -1304,7 +1374,7 @@ lcd_comm_init(void)
             kbd_limits[i].y = param;
             cksum ^= param;
         }
-        need_params = cksum != _ipaq_LCD_params[(4*2)+1];
+        need_params = cksum != _ipaq_LCD_params[(4*2)];
 
         // If the data are currently bad, set up some defaults
         if (need_params) {
@@ -1318,7 +1388,10 @@ lcd_comm_init(void)
             kbd_limits[CS_LR].y = 836;
         }
 
-        if (!need_params) {
+        if (get_model() != MODEL_H3600) {
+
+        }
+        else if (!need_params) {
             // See if the guy wants to force new parameters
             lcd_clear();
             lcd_moveto(5, screen_height/2);
@@ -1357,7 +1430,7 @@ lcd_comm_init(void)
                 close(kbd_limits[CS_UL].y, kbd_limits[CS_UR].y) &&
                 close(kbd_limits[CS_LL].y, kbd_limits[CS_LR].y)) {
                 // Save values so we don't need to repeat this
-                cksum = (unsigned short)&_ipaq_LCD_params[0];
+                cksum = _ipaq_LCD_params[0];
                 for (i = 0;  i < 4;  i++) {
                     param = kbd_limits[i].x;
                     cksum ^= param;
@@ -1366,7 +1439,7 @@ lcd_comm_init(void)
                     cksum ^= param;
                     _ipaq_LCD_params[(i*2)+1] = param;
                 }
-                _ipaq_LCD_params[(4*2)+1] = cksum;
+                _ipaq_LCD_params[(4*2)] = cksum;
                 break;
             }
         }
@@ -1404,6 +1477,7 @@ lcd_comm_init(void)
     }
 }
 
+#endif
 // Control state of LCD display
 
 void
@@ -1427,4 +1501,4 @@ lcd_on(bool enable)
         enabled = false;
     }
 }
-#endif
+

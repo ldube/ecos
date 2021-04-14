@@ -60,6 +60,15 @@ extern void ipaq_EGPIO(unsigned long mask, unsigned long value);
 
 extern int jacket_present(void); // return non-zero if jacket is present
 
+
+typedef enum {
+  MODEL_H3600   = 0x36, // '6'
+  MODEL_H3800   = 0x38, // '8'
+  MODEL_UNKNOWN = 0x3F, // '?'
+} model_t;
+
+extern model_t get_model(void);
+
 #endif
 
 // 
@@ -198,6 +207,169 @@ extern int jacket_present(void); // return non-zero if jacket is present
                            // If this bit is "0" the device will respond when PSKTSEL is "0"
                            // If this bit is "1" the device will respond when PSKTSEL is "1"
 #define CMD_TST   (1 << 15)// TST Test bit: This bit should be set to 0 at all times
+
+
+// H3800
+#define A2_BASE          0x49000000
+#define PIOA_BASE        (A2_BASE)
+#define PIOB_BASE        (A2_BASE + 0x0200)
+#define ADC_BASE         (A2_BASE + 0x1200)
+
+#define GLOBAL_IEN       *(volatile cyg_uint32*)(A2_BASE + 0x1600 + 0x00)
+
+#define PIOC_DATA        *(volatile cyg_uint32*)(A2_BASE + 0x1e00 + 0x68)
+#define  H3800_SD_PWR    (0x01 << 1)
+#define  H3800_LCD_ON    (0x1F << 5 )
+#define  H3800_BLPWR_ON  (0x01 << 10)
+#define  H3800_SPKR_ON   (0x01 << 12)
+#define  H3800_EAR_OFF   (0x01 << 13)
+#define  H3800_AUD_PWRON (0x01 << 14)
+#define  H36_AUDIO       (SA1110_EIO_AUDIO | SA1110_EIO_MUTE | SA1110_EIO_AMP)
+#define  H38_A1_MASK     (SA1110_EIO_LCD_3V3 | H36_AUDIO)
+
+#define PIOA_DIR         *(volatile cyg_uint32*)(PIOA_BASE + 0x00) // High for input
+#define PIOA_EDGE        *(volatile cyg_uint32*)(PIOA_BASE + 0x04) // High for edge
+#define PIOA_RISE        *(volatile cyg_uint32*)(PIOA_BASE + 0x08) // High for rising
+#define PIOA_LEVEL       *(volatile cyg_uint32*)(PIOA_BASE + 0x0C) // High for high
+#define PIOA_ISTAT       *(volatile cyg_uint32*)(PIOA_BASE + 0x10) // Write to clear
+#define PIOA_DATA        *(volatile cyg_uint32*)(PIOA_BASE + 0x14)
+#define PIOA_IEN         *(volatile cyg_uint32*)(PIOA_BASE + 0x1C)
+#define PIOA_ALT         *(volatile cyg_uint32*)(PIOA_BASE + 0x3C)
+#define  PIOA_Y1         (1 << 0)
+#define  PIOA_X0         (1 << 1)
+#define  PIOA_Y0         (1 << 2)
+#define  PIOA_X1         (1 << 3)
+#define  PIOA_PEN        (1 << 5)
+#define  PIOA_SD         (1 << 6)
+#define  PIOA_SLT        (1 << 11)
+
+#define PIOB_DIR         *(volatile cyg_uint32*)(PIOB_BASE + 0x00) // High for input
+#define PIOB_EDGE        *(volatile cyg_uint32*)(PIOB_BASE + 0x04) // High for edge
+#define PIOB_RISE        *(volatile cyg_uint32*)(PIOB_BASE + 0x08) // High for rising
+#define PIOB_LEVEL       *(volatile cyg_uint32*)(PIOB_BASE + 0x0C) // High for high
+#define PIOB_ISTAT       *(volatile cyg_uint32*)(PIOB_BASE + 0x10) // Write to clear
+#define PIOB_DATA        *(volatile cyg_uint32*)(PIOB_BASE + 0x14)
+#define PIOB_IEN         *(volatile cyg_uint32*)(PIOB_BASE + 0x1C)
+#define  PIOB_ADC        (1 << 18)
+#define  PIOB_TMR0       (1 << 21)
+#define PIOB_ALT         *(volatile cyg_uint32*)(PIOB_BASE + 0x3C)
+
+
+#define  H3800_OPT_PWR   (1 << 13)
+#define  H3800_OPT       (1 << 12)
+#define  H3800_CF_RESET  (1 << 8)
+#define  H3800_EAR_OUT   (1 << 7)
+#define  H3800_SD_EMPTY  (1 << 6)
+
+
+#define A2_CLOCK_EN      *(volatile cyg_uint32*)(A2_BASE + 0x1000 + 0x00)
+#define A2_CLK_EX2       ( 1 << 15 )
+#define A2_CLK_EX1       ( 1 << 14 )
+#define A2_CLK_EX0       ( 1 << 13 )
+#define A2_CLK_SD(x)     ( (x) << 10 )
+#define A2_CLK_PWM       ( 1 << 7  )
+#define A2_CLK_ADC       ( 1 << 4 )
+#define A2_CLK_AUD_0     ( 1 << 0 ) // For 8kHz
+#define A2_CLK_AUD_1     ( 1 << 1 ) // For 48kHz
+#define A2_CLK_AUD_2     ( 1 << 2 ) // For 11kHz
+#define A2_CLK_AUD_3     ( 1 << 3 ) // For 44 or 22 kHz
+#define   SD3_HZ 33868800
+
+#define A2_PWM0_TBASE      *(volatile cyg_uint8  *)(A2_BASE + 0x0600 + 0x00)
+#define  A2_PWM_TBASE_EN   (1 << 4)
+#define  A2_PWM_TBASE_MAX  8
+#define A2_PWM0_PERIOD     *(volatile cyg_uint16 *)(A2_BASE + 0x0600 + 0x04)
+#define A2_PWM0_DUTY       *(volatile cyg_uint16 *)(A2_BASE + 0x0600 + 0x08)
+#define  DUTY_MAX 48
+#define  DUTY_MIN 14
+
+#define LED_BASE(n)        (A2_BASE + 0x0800 + ((n)*0x80))
+#define LED_TBASE(n)       *(volatile cyg_uint32 *)(LED_BASE(n) + 0x00)
+#define  LED_TBASE_MAX     0xD
+#define  LED_TBASE_EN      (1 << 4)
+#define  LED_TBASE_AS      (1 << 5)
+#define  LED_TBASE_AL      (1 << 6)
+#define LED_PERIOD(n)      *(volatile cyg_uint32  *)(LED_BASE(n) + 0x04)
+#define LED_DUTY(n)        *(volatile cyg_uint32 *)(LED_BASE(n) + 0x08)
+#define LED_ASCLK(n)       *(volatile cyg_uint32 *)(LED_BASE(n) + 0x0C)
+
+#define A2_FLASH_CTRL      *(volatile cyg_uint8*)(A2_BASE + 0x1F00)
+
+// - ADC - 10 bit data
+
+#define ADC_MUX            *(volatile cyg_uint32*)(ADC_BASE + 0x00)
+#define  MUX_LIGHT         0
+#define  MUX_TOUCHX        3
+#define  MUX_TOUCHY        4
+#define  MUX_CLK_EN        8
+#define ADC_CTRL           *(volatile cyg_uint32*)(ADC_BASE + 0x04)
+#define  ADC_PRSCL(x)      (0xF & (x))
+#define  ADC_FREE_RUN      (1 << 4)
+#define  ADC_INT_EN        (1 << 5)
+#define  ADC_START         (1 << 6) //Auto clear when done.
+#define  ADC_PWR           (1 << 7)
+#define ADC_DATA           *(volatile cyg_uint32*)(ADC_BASE + 0x08)
+
+// - MMC
+
+#define MMC_BASE          (A2_BASE + 0x1c00)
+#define SDREG_CLKCTRL     *(volatile cyg_uint8 *)(MMC_BASE + 0x00)
+#define  CLKCTRL_STOP     1
+#define  CLKCTRL_START    2
+#define SDREG_STAT        *(volatile cyg_uint16*)(MMC_BASE + 0x04)
+
+#define  STAT_TO_READ     (1 << 0)
+#define  STAT_TO_RESP     (1 << 1)
+#define  STAT_CRC_WR      (1 << 2)
+#define  STAT_CRC_READ    (1 << 3)
+#define  STAT_SPI_READ    (1 << 4)
+#define  STAT_CRC_RESP    (1 << 5)
+#define  STAT_FIFOE       (1 << 6)
+#define  STAT_FIFOF       (1 << 7)
+#define  STAT_CLOCK       (1 << 8)
+#define  STAT_CRC         (3 << 9)
+#define  STAT_XFRDONE     (1 << 11)
+#define  STAT_WRDONE      (1 << 12)
+#define  STAT_RSPDONE     (1 << 13)
+
+#define  STAT_CRC_ERR     (STAT_CRC_WR | STAT_CRC_READ | STAT_CRC_RESP)
+#define  STAT_TO_ERR      (STAT_TO_READ | STAT_TO_RESP)
+#define  STAT_ERRORS      (STAT_TO_ERR | STAT_CRC_ERR | STAT_SPI_READ)
+
+#define SDREG_CLKFREQ     *(volatile cyg_uint8 *)(MMC_BASE + 0x08)
+
+#define SDREG_RESETREV    *(volatile cyg_uint16*)(MMC_BASE + 0x0C)
+#define SDREG_CTRL        *(volatile cyg_uint16*)(MMC_BASE + 0x14)
+#define  CTRL_RESP_NONE   0x00
+#define  CTRL_RESP_R1     0x01
+#define  CTRL_RESP_R2     0x02
+#define  CTRL_RESP_R3     0x03
+#define  CTRL_DE          (1 << 2)
+#define  CTRL_WRITE       (1 << 3)
+#define  CTRL_INIT        (1 << 6)
+#define  CTRL_BUSY        (1 << 7)
+
+#define SDREG_RESP_TO     *(volatile cyg_uint8 *)(MMC_BASE + 0x18)
+#define SDREG_READ_TO     *(volatile cyg_uint16*)(MMC_BASE + 0x1C)
+
+#define SDREG_BLEN        *(volatile cyg_uint16*)(MMC_BASE + 0x20)
+#define   DBS_BLOCKSIZE_MASK    0x3ff
+#define   DBS_BLOCKSIZE(s)    ((s) & DBS_BLOCKSIZE_MASK)
+#define   DBS_BLOCKSIZE_MAX   0x800
+#define SDREG_NBLK        *(volatile cyg_uint16*)(MMC_BASE + 0x24)
+
+#define SDREG_INTMASK     *(volatile cyg_uint8*)(MMC_BASE + 0x34)
+#define  INT_TX_DONE       (1 << 0)
+#define  INT_PRG_DONE      (1 << 1)
+#define  INT_CMD_RESP      (1 << 2)
+#define  INT_BUF_RDY       (1 << 3)
+#define  INT_ALL           (INT_TX_DONE | INT_PRG_DONE | INT_CMD_RESP | INT_BUF_RDY)
+
+#define SDREG_CMD         *(volatile cyg_uint8 *)(MMC_BASE + 0x38)
+#define SDREG_ARGH        *(volatile cyg_uint16*)(MMC_BASE + 0x3C)
+#define SDREG_ARGL        *(volatile cyg_uint16*)(MMC_BASE + 0x40)
+#define SDREG_RSP         *(volatile cyg_uint16*)(MMC_BASE + 0x44)
+#define SDREG_DATA        *(volatile cyg_uint16*)(MMC_BASE + 0x4C)
 
 /* end of ipaq.h                                                          */
 #endif /* CYGONCE_IPAQ_H */

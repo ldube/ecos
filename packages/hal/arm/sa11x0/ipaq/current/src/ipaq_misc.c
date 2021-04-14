@@ -111,6 +111,51 @@ hal_mmu_init(void)
 
 }
 
+
+static void h3800_ctrl(cyg_uint32 mask, cyg_uint32 value)
+{
+  cyg_uint32 new_value = PIOC_DATA;
+  cyg_uint32 new_mask = 0;
+  if (mask & SA1110_EIO_LCD_3V3)
+  {
+    new_mask |= H3800_LCD_ON;
+  }
+  if (mask & SA1110_EIO_MUTE)
+  {
+    new_mask |= (H3800_SPKR_ON | H3800_EAR_OFF);
+  }
+  if (mask & SA1110_EIO_AUDIO)
+  {
+    new_mask |= H3800_AUD_PWRON;
+  }
+  new_value &= ~new_mask;
+  value &= mask;
+
+  if (value & SA1110_EIO_LCD_3V3)
+  {
+    new_value |= H3800_LCD_ON;
+  }
+  if (value & SA1110_EIO_MUTE_ON)
+  {
+    new_value |= H3800_EAR_OFF; // SPKR_ON is already clear
+  }
+  else
+  {
+#if 1
+    new_value &= ~(H3800_SPKR_ON | H3800_EAR_OFF); // ear on
+#else
+    new_value |= (H3800_SPKR_ON | H3800_EAR_OFF); // spk on
+#endif
+  }
+  if (value & SA1110_EIO_AUDIO_ON)
+  {
+    A2_CLOCK_EN &= ~0xF;
+    A2_CLOCK_EN |= (A2_CLK_EX1 | A2_CLK_AUD_3);
+    new_value |= H3800_AUD_PWRON;
+  }
+  PIOC_DATA = new_value;
+}
+
 //
 // Board control register support
 //   Update the board control register (write only).  Only the bits
@@ -120,8 +165,57 @@ hal_mmu_init(void)
 void
 ipaq_EGPIO(unsigned long mask, unsigned long value)
 {
+  model_t model = get_model();
+  if (model == MODEL_H3600)
+  {
     _ipaq_EGPIO = (_ipaq_EGPIO & ~mask) | (mask & value);
     *SA1110_EGPIO = _ipaq_EGPIO;
+  }
+  else if (model == MODEL_H3800)
+  {
+    cyg_uint32 new_value = PIOA_DATA;
+    cyg_uint32 new_mask = 0;
+    if (mask & H38_A1_MASK)
+    {
+      h3800_ctrl(mask, value);
+      return;
+    }
+
+    if (mask & SA1110_EIO_OPT_PWR)
+    {
+      new_mask |= H3800_OPT_PWR;
+    }
+    if (mask & SA1110_EIO_OPT)
+    {
+      new_mask |= H3800_OPT;
+    }
+    if (mask & SA1110_EIO_CF_RESET)
+    {
+      new_mask |= H3800_CF_RESET;
+    }
+    if (mask & SA1110_EIO_VPP)
+    {
+      A2_FLASH_CTRL = (value & SA1110_EIO_VPP_ON) ? 1 : 0;
+      return;
+    }
+
+    new_value &= ~new_mask;
+    value &= mask;
+
+    if (value & SA1110_EIO_CF_RESET_ENABLE)
+    {
+      new_value |= H3800_CF_RESET;
+    }
+    if (value & SA1110_EIO_OPT_PWR_ON)
+    {
+      new_value |= H3800_OPT_PWR;
+    }
+    if (value & SA1110_EIO_OPT_ON)
+    {
+      new_value |= H3800_OPT;
+    }
+    PIOA_DATA = new_value;
+  }
 }
 
 //
@@ -131,11 +225,15 @@ ipaq_EGPIO(unsigned long mask, unsigned long value)
 void
 plf_hardware_init(void)
 {
-    // Force "alternate" use of GPIO pins used for LCD screen
-    *SA11X0_GPIO_ALTERNATE_FUNCTION |= 0x000003FC;      // Bits 2..9
-    *SA11X0_GPIO_PIN_DIRECTION |= 0x000003FC;           // Bits 2..9
-    *SA11X0_GPIO_PIN_OUTPUT_CLEAR = 0x000003FC;         // Bits 2..9
+  // Force "alternate" use of GPIO pins used for LCD screen
+  *SA11X0_GPIO_ALTERNATE_FUNCTION |= 0x000003FC;      // Bits 2..9
+  *SA11X0_GPIO_PIN_DIRECTION |= 0x000003FC;           // Bits 2..9
+  *SA11X0_GPIO_PIN_OUTPUT_CLEAR = 0x000003FC;         // Bits 2..9
 
+  *SA1110_LCCR0 &= ~(1);
+
+  if (get_model() == MODEL_H3600)
+  {
     // Pins used for buttons, communications with Atmel
     //*SA11X0_GPIO_PIN_DIRECTION &= 0x03FE0C003;
     *SA11X0_GPIO_RISING_EDGE_DETECT |= 0x00000002;
@@ -145,10 +243,39 @@ plf_hardware_init(void)
     *SA1110_GPCLK_CONTROL_0 = SA1110_GPCLK_SUS_UART;
     *SA11X0_PPC_PIN_ASSIGNMENT &= ~SA11X0_PPC_UART_PIN_REASSIGNED;
     atmel_init();
+    ipaq_EGPIO(SA1110_EIO_LCD_3V3|SA1110_EIO_LCD_CTRL|SA1110_EIO_LCD_5V|SA1110_EIO_LCD_VDD,
+               SA1110_EIO_LCD_3V3_ON|SA1110_EIO_LCD_CTRL_ON|SA1110_EIO_LCD_5V_ON|SA1110_EIO_LCD_VDD_ON);
+  }
+  else if(get_model() == MODEL_H3800)
+  {
+    PIOA_DIR |= (PIOA_PEN);
+    PIOB_DIR = 0xFFF;
+    PIOB_ALT = 0x003e;
+    PIOB_EDGE &= ~0xFFF;
 
-    // Configure the jacket detection pin
-    *SA11X0_GPIO_PIN_DIRECTION      &= ~JACKET_DETECT; // input
-    *SA11X0_GPIO_ALTERNATE_FUNCTION &= ~JACKET_DETECT; // normal gpio
+    PIOB_LEVEL = ~PIOB_DATA & 0xFFF;
+    PIOA_IEN = 0;
+    PIOB_IEN = 0;
+    GLOBAL_IEN |= 1;
+    PIOB_IEN = 0xFFF | PIOB_ADC;
+
+
+    PIOA_EDGE |= PIOA_PEN;
+    PIOA_LEVEL &= ~PIOA_PEN;
+    PIOA_IEN &= ~PIOA_PEN;
+    PIOA_ISTAT |= PIOA_PEN;
+    PIOA_IEN |= PIOA_PEN;
+
+    cyg_uint16 v = PIOA_DATA & ~(PIOA_X0 | PIOA_Y0 | PIOA_Y1 | PIOA_X1);
+    PIOA_DATA = v | (PIOA_X0 | PIOA_Y1 | PIOA_X1);  // Pen mode
+
+    A2_CLOCK_EN |= (A2_CLK_ADC | A2_CLK_EX1);
+  }
+  lcd_brightness(0);
+
+  // Configure the jacket detection pin
+  *SA11X0_GPIO_PIN_DIRECTION      &= ~JACKET_DETECT; // input
+  *SA11X0_GPIO_ALTERNATE_FUNCTION &= ~JACKET_DETECT; // normal gpio
 }
 
 #include CYGHWR_MEMORY_LAYOUT_H
@@ -185,4 +312,22 @@ plf_if_init(void)
 int jacket_present(void) // return non-zero if jacket is present
 {
   return JACKET_DETECT & *SA11X0_GPIO_PIN_LEVEL ? 0 : 1;
+}
+
+// This works because my devices have different cpu id's.
+//
+model_t get_model(void)
+{
+  unsigned int cpuid;
+  __asm__ volatile("mrc p15, 0, %0, c0, c0, 0" : "=r" (cpuid));
+
+  if (cpuid == 0x6901b119)
+  {
+    return MODEL_H3800;
+  }
+  else if (cpuid == 0x6901b118)
+  {
+    return MODEL_H3600;
+  }
+  return MODEL_UNKNOWN;
 }

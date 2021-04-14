@@ -54,6 +54,7 @@ struct lcd_info {
 void lcd_init(int depth);
 void lcd_clear(void);
 void lcd_brightness(int level);
+int lcd_get_brightness(void);
 void lcd_moveto(int X, int Y);
 void lcd_putc(cyg_int8 c);
 int  lcd_printf(char const *fmt, ...);
